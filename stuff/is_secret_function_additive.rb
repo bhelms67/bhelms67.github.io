@@ -10,13 +10,15 @@ def is_prime?(num)
       return false
     end
   end
+
+  true
 end
 
 def primes_array(limit)
   primes = Array.new
   primes.push(2)
 
-  (2..limit).each do |num|
+  (2..limit-1).each do |num|
     if is_prime?(num)
       primes.push(num)
     end

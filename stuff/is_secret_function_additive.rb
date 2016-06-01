@@ -43,4 +43,8 @@ def is_function_additive?(num)
   true
 end
 
-puts "Secret function #{is_function_additive?(Integer(ARGV[0])) ? 'is' : 'is not'} additive"
+if Integer(ARGV[0]) < 2 
+  puts "Go bigger"
+else
+  puts "Secret function #{is_function_additive?(Integer(ARGV[0])) ? 'is' : 'is not'} additive"
+end

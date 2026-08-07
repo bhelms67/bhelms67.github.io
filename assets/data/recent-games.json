@@ -3,11 +3,26 @@
     "name": "Tacota",
     "avatar": "https://avatars.steamstatic.com/30ab01b8ed6b2d93588ce6eb78dd362c9cc277fb_full.jpg"
   },
-  "appids": [
-    3282300,
-    3780860,
-    730,
-    2807960,
-    17480
+  "games": [
+    {
+      "appid": 3282300,
+      "playtime_2weeks": 945
+    },
+    {
+      "appid": 3780860,
+      "playtime_2weeks": 277
+    },
+    {
+      "appid": 730,
+      "playtime_2weeks": 156
+    },
+    {
+      "appid": 2807960,
+      "playtime_2weeks": 83
+    },
+    {
+      "appid": 17480,
+      "playtime_2weeks": 34
+    }
   ]
 }

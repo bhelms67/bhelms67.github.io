@@ -1,7 +1,13 @@
 {
   "player": {
-    "name": "",
-    "avatar": ""
+    "name": "Tacota",
+    "avatar": "https://avatars.steamstatic.com/30ab01b8ed6b2d93588ce6eb78dd362c9cc277fb_full.jpg"
   },
-  "appids": []
+  "appids": [
+    3282300,
+    3780860,
+    730,
+    2807960,
+    17480
+  ]
 }

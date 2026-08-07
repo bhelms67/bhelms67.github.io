@@ -32,10 +32,30 @@ function addGame(game) {
   const gameContainer = document.createElement('div');
   gameContainer.className = 'steam-game';
 
+  const playtime = document.createElement('div');
+  playtime.className = 'steam-game-playtime';
+
+  const playtimeHeading = document.createElement('p');
+  playtimeHeading.textContent = 'Time played:';
+  playtime.appendChild(playtimeHeading);
+
+  const playtimeDetails = document.createElement('div');
+  playtimeDetails.className = 'steam-game-playtime-details';
+
   if (Number.isFinite(game.playtime_2weeks)) {
-    const playtime = document.createElement('p');
-    playtime.className = 'steam-game-playtime';
-    playtime.textContent = `Time played: ${formatPlaytime(game.playtime_2weeks)}`;
+    const recentPlaytime = document.createElement('div');
+    recentPlaytime.textContent = `Last 2 weeks - ${formatPlaytime(game.playtime_2weeks)}`;
+    playtimeDetails.appendChild(recentPlaytime);
+  }
+
+  if (Number.isFinite(game.playtime_forever)) {
+    const totalPlaytime = document.createElement('div');
+    totalPlaytime.textContent = `All time - ${formatPlaytime(game.playtime_forever)}`;
+    playtimeDetails.appendChild(totalPlaytime);
+  }
+
+  if (playtimeDetails.childElementCount > 0) {
+    playtime.appendChild(playtimeDetails);
     gameContainer.appendChild(playtime);
   }
 

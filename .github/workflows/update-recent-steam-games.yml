@@ -45,8 +45,11 @@ jobs:
 
           games = recent_games_data.get('response', {}).get('games', [])
           player = player_data.get('response', {}).get('players', [{}])[0]
-          appids = [
-              game['appid']
+          games = [
+              {
+                  'appid': game['appid'],
+                  'playtime_2weeks': game.get('playtime_2weeks', 0),
+              }
               for game in sorted(
                   games,
                   key=lambda game: game.get('playtime_2weeks', 0),
@@ -61,7 +64,7 @@ jobs:
                           'name': player.get('personaname', ''),
                           'avatar': player.get('avatarfull', ''),
                       },
-                      'appids': appids,
+                      'games': games,
                   },
                   file,
                   indent=2,

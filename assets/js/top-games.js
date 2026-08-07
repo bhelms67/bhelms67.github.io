@@ -9,7 +9,7 @@ async function loadTopGames() {
     const iframe = document.createElement('iframe');
     iframe.src = `https://steamdb.info/embed/?appid=${appid}`;
     iframe.height = '389';
-    iframe.style.cssText = 'border:0;overflow:hidden;width:100%';
+    iframe.style.cssText = 'border:0;overflow:hidden;width:75%';
     iframe.loading = 'lazy';
     embeds.appendChild(iframe);
   });

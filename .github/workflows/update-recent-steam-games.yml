@@ -1,0 +1,64 @@
+name: Update recent Steam games
+
+on:
+  schedule:
+    - cron: '0 16 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch recently played games
+        env:
+          STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
+          STEAM_ID: ${{ secrets.STEAM_ID }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from urllib.parse import urlencode
+          from urllib.request import urlopen
+
+          api_key = os.environ.get('STEAM_API_KEY')
+          steam_id = os.environ.get('STEAM_ID')
+          if not api_key or not steam_id:
+              print('STEAM_API_KEY or STEAM_ID is not configured; skipping update.')
+              raise SystemExit(0)
+
+          query = urlencode({'key': api_key, 'steamid': steam_id, 'format': 'json'})
+          url = f'https://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v1/?{query}'
+
+          with urlopen(url) as response:
+              data = json.load(response)
+
+          games = data.get('response', {}).get('games', [])
+          appids = [
+              game['appid']
+              for game in sorted(
+                  games,
+                  key=lambda game: game.get('playtime_2weeks', 0),
+                  reverse=True,
+              )[:5]
+          ]
+
+          with open('assets/data/recent-games.json', 'w', encoding='utf-8') as file:
+              json.dump(appids, file, indent=2)
+              file.write('\n')
+          PY
+
+      - name: Commit updated game list
+        run: |
+          git diff --quiet assets/data/recent-games.json || (
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add assets/data/recent-games.json
+            git commit -m 'chore(games): update recent Steam games'
+            git push
+          )

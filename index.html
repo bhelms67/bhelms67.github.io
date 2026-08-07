@@ -9,6 +9,8 @@
     p { color: white; }
     body { background-color: black; }
     .steamdb-section { margin-top: 3rem; }
+    .steam-profile { align-items: center; color: white; display: flex; gap: 0.75rem; margin-bottom: 1rem; }
+    .steam-profile img { height: 48px; width: 48px; }
     #steamdb-embeds { display: grid; gap: 1rem; }
   </style>
 
@@ -17,6 +19,7 @@
 
   <section class="steamdb-section">
     <h2>My Top 5 Steam Games - Last 2 Weeks</h2>
+    <div id="steam-profile" class="steam-profile"></div>
     <div id="steamdb-embeds"></div>
   </section>
 

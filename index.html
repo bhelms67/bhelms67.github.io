@@ -5,20 +5,22 @@
 <body>
   <style>
     h1 { color: white; }
+    h2 { color: white; }
     p { color: white; }
     body { background-color: black; }
+    .steamdb-section { margin-top: 2rem; }
   </style>
 
   <h1>Hello, this is my site. </h1>
   <img src="/assets/images/compliments_to_the_chef.jpg" />
 
-  <iframe
-    src="https://steamdb.info/embed/?appid=3282300"
-    height="389"
-    style="border:0;overflow:hidden;width:100%"
-    loading="lazy">
-  </iframe>
+  <section class="steamdb-section">
+    <h2>Top 5 Played Games on Steam</h2>
+    <div id="steamdb-embeds"></div>
+  </section>
 
   <p>k bye</p>
+
+  <script src="/assets/js/top-games.js"></script>
 </body>
 </html>

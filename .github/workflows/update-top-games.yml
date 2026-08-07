@@ -1,0 +1,42 @@
+name: Update top Steam games
+
+on:
+  schedule:
+    - cron: '0 16 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch the five most played games
+        run: |
+          python3 - <<'PY'
+          import json
+          from urllib.request import urlopen
+
+          url = 'https://api.steampowered.com/ISteamChartsService/GetMostPlayedGames/v1/'
+          with urlopen(url) as response:
+              data = json.load(response)
+
+          appids = [game['appid'] for game in data['response']['ranks'][:5]]
+          with open('top-games.json', 'w', encoding='utf-8') as file:
+              json.dump(appids, file, indent=2)
+              file.write('\n')
+          PY
+
+      - name: Commit updated game list
+        run: |
+          git diff --quiet top-games.json || (
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add top-games.json
+            git commit -m 'chore(steam): update top games'
+            git push
+          )

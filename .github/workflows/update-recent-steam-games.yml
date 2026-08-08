@@ -18,7 +18,7 @@ jobs:
       - name: Fetch recently played games
         env:
           STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
-          STEAM_ID: ${{ secrets.STEAM_ID }}
+          STEAM_IDS: ${{ secrets.STEAM_IDS }}
         run: |
           python3 - <<'PY'
           import json
@@ -27,49 +27,58 @@ jobs:
           from urllib.request import urlopen
 
           api_key = os.environ.get('STEAM_API_KEY')
-          steam_id = os.environ.get('STEAM_ID')
-          if not api_key or not steam_id:
-              print('STEAM_API_KEY or STEAM_ID is not configured; skipping update.')
+          steam_ids_json = os.environ.get('STEAM_IDS')
+          if not api_key or not steam_ids_json:
+              print('STEAM_API_KEY or STEAM_IDS is not configured; skipping update.')
               raise SystemExit(0)
 
-          recent_games_query = urlencode({'key': api_key, 'steamid': steam_id, 'format': 'json'})
-          recent_games_url = f'https://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v1/?{recent_games_query}'
-          player_query = urlencode({'key': api_key, 'steamids': steam_id, 'format': 'json'})
-          player_url = f'https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?{player_query}'
+          try:
+              steam_ids = json.loads(steam_ids_json)
+          except json.JSONDecodeError as error:
+              raise ValueError('STEAM_IDS must be a JSON array of Steam IDs.') from error
 
-          with urlopen(recent_games_url) as response:
-              recent_games_data = json.load(response)
+          if not isinstance(steam_ids, list) or not all(isinstance(steam_id, str) and steam_id for steam_id in steam_ids):
+              raise ValueError('STEAM_IDS must be a JSON array of non-empty Steam ID strings.')
 
-          with urlopen(player_url) as response:
-              player_data = json.load(response)
+          profiles = []
+          for steam_id in steam_ids:
+              recent_games_query = urlencode({'key': api_key, 'steamid': steam_id, 'format': 'json'})
+              recent_games_url = f'https://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v1/?{recent_games_query}'
+              player_query = urlencode({'key': api_key, 'steamids': steam_id, 'format': 'json'})
+              player_url = f'https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?{player_query}'
 
-          games = recent_games_data.get('response', {}).get('games', [])
-          player = player_data.get('response', {}).get('players', [{}])[0]
-          games = [
-              {
-                  'appid': game['appid'],
-                  'playtime_2weeks': game.get('playtime_2weeks', 0),
-                  'playtime_forever': game.get('playtime_forever', 0),
-              }
-              for game in sorted(
-                  games,
-                  key=lambda game: game.get('playtime_2weeks', 0),
-                  reverse=True,
-              )[:5]
-          ]
+              with urlopen(recent_games_url) as response:
+                  recent_games_data = json.load(response)
 
-          with open('assets/data/recent-games.json', 'w', encoding='utf-8') as file:
-              json.dump(
+              with urlopen(player_url) as response:
+                  player_data = json.load(response)
+
+              games = recent_games_data.get('response', {}).get('games', [])
+              player = player_data.get('response', {}).get('players', [{}])[0]
+              profiles.append(
                   {
+                      'steamId': steam_id,
                       'player': {
-                          'name': player.get('personaname', ''),
+                          'name': player.get('personaname', steam_id),
                           'avatar': player.get('avatarfull', ''),
                       },
-                      'games': games,
-                  },
-                  file,
-                  indent=2,
+                      'games': [
+                          {
+                              'appid': game['appid'],
+                              'playtime_2weeks': game.get('playtime_2weeks', 0),
+                              'playtime_forever': game.get('playtime_forever', 0),
+                          }
+                          for game in sorted(
+                              games,
+                              key=lambda game: game.get('playtime_2weeks', 0),
+                              reverse=True,
+                          )[:5]
+                      ],
+                  }
               )
+
+          with open('assets/data/recent-games.json', 'w', encoding='utf-8') as file:
+              json.dump({'profiles': profiles}, file, indent=2)
               file.write('\n')
           PY
 

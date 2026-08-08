@@ -1,6 +1,7 @@
 const recentGamesUrl = 'https://raw.githubusercontent.com/bhelms67/bhelms67.github.io/master/assets/data/recent-games.json';
 const embeds = document.getElementById('steamdb-embeds');
 const profile = document.getElementById('steam-profile');
+const profileSelect = document.getElementById('steam-profile-select');
 
 function addProfile(player) {
   if (!player.name || !player.avatar) {
@@ -15,6 +16,10 @@ function addProfile(player) {
   name.textContent = player.name;
 
   profile.append(avatar, name);
+}
+
+function clearContent(element) {
+  element.replaceChildren();
 }
 
 function formatPlaytime(minutes) {
@@ -69,13 +74,12 @@ function addGame(game) {
   embeds.appendChild(gameContainer);
 }
 
-async function loadRecentGames() {
-  const response = await fetch(recentGamesUrl);
-  const data = await response.json();
-  const games = data.games || (data.appids || []).map((appid) => ({ appid }));
+function showProfile(selectedProfile) {
+  clearContent(profile);
+  clearContent(embeds);
+  addProfile(selectedProfile.player || {});
 
-  addProfile(data.player || {});
-
+  const games = selectedProfile.games || [];
   if (games.length === 0) {
     embeds.textContent = 'No Steam playtime has been recorded for the last two weeks.';
     return;
@@ -84,6 +88,40 @@ async function loadRecentGames() {
   games.slice(0, 5).forEach(addGame);
 }
 
+function addProfileOptions(profiles) {
+  clearContent(profileSelect);
+
+  profiles.forEach((steamProfile, index) => {
+    const option = document.createElement('option');
+    option.value = String(index);
+    option.textContent = steamProfile.player?.name || steamProfile.steamId;
+    profileSelect.appendChild(option);
+  });
+
+  profileSelect.disabled = false;
+  profileSelect.addEventListener('change', () => {
+    showProfile(profiles[Number(profileSelect.value)]);
+  });
+}
+
+async function loadRecentGames() {
+  const response = await fetch(recentGamesUrl);
+  const data = await response.json();
+  const profiles = data.profiles || [];
+
+  if (profiles.length === 0) {
+    profileSelect.replaceChildren(new Option('No profiles available'));
+    profileSelect.disabled = true;
+    embeds.textContent = 'No Steam profiles are configured.';
+    return;
+  }
+
+  addProfileOptions(profiles);
+  showProfile(profiles[0]);
+}
+
 loadRecentGames().catch(() => {
+  profileSelect.replaceChildren(new Option('Profiles unavailable'));
+  profileSelect.disabled = true;
   embeds.textContent = 'Unable to load recent Steam games.';
 });

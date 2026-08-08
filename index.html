@@ -8,7 +8,9 @@
     h2 { color: white; }
     p { color: white; }
     body { background-color: black; }
-    .steamdb-section { margin-top: 3rem; }
+    .games-section { margin-top: 3rem; }
+    .steam-profile-picker { color: white; margin-bottom: 1rem; }
+    .steam-profile-picker select { margin-left: 0.5rem; }
     .steam-profile { align-items: center; color: white; display: flex; gap: 0.75rem; margin-bottom: 1rem; }
     .steam-profile img { height: 48px; width: 48px; }
     #steamdb-embeds { display: grid; gap: 1rem; }
@@ -21,8 +23,14 @@
   <h1>Hello, this is my site. </h1>
   <img src="/assets/images/compliments_to_the_chef.jpg" />
 
-  <section class="steamdb-section">
-    <h2>My Top 5 Steam Games - Last 2 Weeks</h2>
+  <section class="games-section">
+    <h2>Top 5 Steam Games - Last 2 Weeks</h2>
+    <label class="steam-profile-picker" for="steam-profile-select">
+      Steam profile
+      <select id="steam-profile-select" disabled>
+        <option>Loading profiles...</option>
+      </select>
+    </label>
     <div id="steam-profile" class="steam-profile"></div>
     <div id="steamdb-embeds"></div>
   </section>

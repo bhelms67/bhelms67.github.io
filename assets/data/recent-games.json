@@ -1,33 +1,37 @@
 {
-  "player": {
-    "name": "Tacota",
-    "avatar": "https://avatars.steamstatic.com/30ab01b8ed6b2d93588ce6eb78dd362c9cc277fb_full.jpg"
-  },
-  "games": [
+  "profiles": [
     {
-      "appid": 3282300,
-      "playtime_2weeks": 945,
-      "playtime_forever": 945
-    },
-    {
-      "appid": 3780860,
-      "playtime_2weeks": 277,
-      "playtime_forever": 277
-    },
-    {
-      "appid": 730,
-      "playtime_2weeks": 156,
-      "playtime_forever": 12988
-    },
-    {
-      "appid": 2807960,
-      "playtime_2weeks": 83,
-      "playtime_forever": 1353
-    },
-    {
-      "appid": 17480,
-      "playtime_2weeks": 34,
-      "playtime_forever": 549
+      "player": {
+        "name": "Tacota",
+        "avatar": "https://avatars.steamstatic.com/30ab01b8ed6b2d93588ce6eb78dd362c9cc277fb_full.jpg"
+      },
+      "games": [
+        {
+          "appid": 3282300,
+          "playtime_2weeks": 945,
+          "playtime_forever": 945
+        },
+        {
+          "appid": 3780860,
+          "playtime_2weeks": 277,
+          "playtime_forever": 277
+        },
+        {
+          "appid": 730,
+          "playtime_2weeks": 156,
+          "playtime_forever": 12988
+        },
+        {
+          "appid": 2807960,
+          "playtime_2weeks": 83,
+          "playtime_forever": 1353
+        },
+        {
+          "appid": 17480,
+          "playtime_2weeks": 34,
+          "playtime_forever": 549
+        }
+      ]
     }
   ]
 }

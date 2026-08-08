@@ -1,6 +1,7 @@
 {
   "profiles": [
     {
+      "steamId": "76561197962081680",
       "player": {
         "name": "Tacota",
         "avatar": "https://avatars.steamstatic.com/30ab01b8ed6b2d93588ce6eb78dd362c9cc277fb_full.jpg"
@@ -8,8 +9,8 @@
       "games": [
         {
           "appid": 3282300,
-          "playtime_2weeks": 945,
-          "playtime_forever": 945
+          "playtime_2weeks": 1062,
+          "playtime_forever": 1062
         },
         {
           "appid": 3780860,
@@ -30,6 +31,137 @@
           "appid": 17480,
           "playtime_2weeks": 34,
           "playtime_forever": 549
+        }
+      ]
+    },
+    {
+      "steamId": "76561198001730987",
+      "player": {
+        "name": "Enemy West Close",
+        "avatar": "https://avatars.steamstatic.com/c15e3cb5d56703de9ff7eaee79baa24aa4736cd6_full.jpg"
+      },
+      "games": [
+        {
+          "appid": 1366800,
+          "playtime_2weeks": 6740,
+          "playtime_forever": 262679
+        },
+        {
+          "appid": 3282300,
+          "playtime_2weeks": 3838,
+          "playtime_forever": 3838
+        },
+        {
+          "appid": 2868840,
+          "playtime_2weeks": 658,
+          "playtime_forever": 3952
+        },
+        {
+          "appid": 3780860,
+          "playtime_2weeks": 325,
+          "playtime_forever": 325
+        },
+        {
+          "appid": 730,
+          "playtime_2weeks": 153,
+          "playtime_forever": 58745
+        }
+      ]
+    },
+    {
+      "steamId": "76561197992132085",
+      "player": {
+        "name": "RowdyFalcon",
+        "avatar": "https://avatars.steamstatic.com/32f2d9c146418c4ace9fb8906845eea672330a3e_full.jpg"
+      },
+      "games": [
+        {
+          "appid": 3282300,
+          "playtime_2weeks": 4179,
+          "playtime_forever": 4179
+        },
+        {
+          "appid": 3780860,
+          "playtime_2weeks": 586,
+          "playtime_forever": 585
+        },
+        {
+          "appid": 2807960,
+          "playtime_2weeks": 31,
+          "playtime_forever": 346
+        },
+        {
+          "appid": 686810,
+          "playtime_2weeks": 17,
+          "playtime_forever": 17
+        },
+        {
+          "appid": 223850,
+          "playtime_2weeks": 1,
+          "playtime_forever": 2928
+        }
+      ]
+    },
+    {
+      "steamId": "76561197989866204",
+      "player": {
+        "name": "Fallen",
+        "avatar": "https://avatars.steamstatic.com/049116dc3827584518d1124b90aa06b7fab8d023_full.jpg"
+      },
+      "games": [
+        {
+          "appid": 3282300,
+          "playtime_2weeks": 1168,
+          "playtime_forever": 1168
+        },
+        {
+          "appid": 2868840,
+          "playtime_2weeks": 698,
+          "playtime_forever": 4603
+        },
+        {
+          "appid": 3780860,
+          "playtime_2weeks": 166,
+          "playtime_forever": 166
+        },
+        {
+          "appid": 730,
+          "playtime_2weeks": 154,
+          "playtime_forever": 549
+        }
+      ]
+    },
+    {
+      "steamId": "76561198025429116",
+      "player": {
+        "name": "viligante8",
+        "avatar": "https://avatars.steamstatic.com/950f9f3147d4c8530a5072825d01c34ee3f1afa1_full.jpg"
+      },
+      "games": [
+        {
+          "appid": 238960,
+          "playtime_2weeks": 5028,
+          "playtime_forever": 170457
+        },
+        {
+          "appid": 2141910,
+          "playtime_2weeks": 612,
+          "playtime_forever": 37126
+        },
+        {
+          "appid": 3282300,
+          "playtime_2weeks": 433,
+          "playtime_forever": 433
+        },
+        {
+          "appid": 2868840,
+          "playtime_2weeks": 188,
+          "playtime_forever": 13677
+        },
+        {
+          "appid": 3527290,
+          "playtime_2weeks": 183,
+          "playtime_forever": 183
         }
       ]
     }

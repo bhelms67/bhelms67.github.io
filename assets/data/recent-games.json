@@ -6,13 +6,7 @@
         "name": "Tacota",
         "avatar": "https://avatars.steamstatic.com/30ab01b8ed6b2d93588ce6eb78dd362c9cc277fb_full.jpg"
       },
-      "games": [
-        {
-          "appid": 3282300,
-          "playtime_2weeks": 70,
-          "playtime_forever": 1375
-        }
-      ]
+      "games": []
     },
     {
       "steamId": "76561198001730987",
@@ -23,22 +17,22 @@
       "games": [
         {
           "appid": 1366800,
-          "playtime_2weeks": 4903,
+          "playtime_2weeks": 4368,
           "playtime_forever": 267767
         },
         {
           "appid": 3282300,
-          "playtime_2weeks": 3024,
+          "playtime_2weeks": 2877,
           "playtime_forever": 7047
         },
         {
           "appid": 2868840,
-          "playtime_2weeks": 2638,
-          "playtime_forever": 6590
+          "playtime_2weeks": 2849,
+          "playtime_forever": 6801
         },
         {
           "appid": 2709570,
-          "playtime_2weeks": 262,
+          "playtime_2weeks": 194,
           "playtime_forever": 2121
         }
       ]
@@ -52,8 +46,8 @@
       "games": [
         {
           "appid": 3282300,
-          "playtime_2weeks": 2599,
-          "playtime_forever": 7073
+          "playtime_2weeks": 2297,
+          "playtime_forever": 7115
         },
         {
           "appid": 2592160,
@@ -62,8 +56,8 @@
         },
         {
           "appid": 3079210,
-          "playtime_2weeks": 105,
-          "playtime_forever": 88
+          "playtime_2weeks": 138,
+          "playtime_forever": 122
         },
         {
           "appid": 4809930,
@@ -86,8 +80,8 @@
       "games": [
         {
           "appid": 2868840,
-          "playtime_2weeks": 1481,
-          "playtime_forever": 6255
+          "playtime_2weeks": 1487,
+          "playtime_forever": 6432
         },
         {
           "appid": 3282300,
@@ -105,23 +99,23 @@
       "games": [
         {
           "appid": 238960,
-          "playtime_2weeks": 2802,
+          "playtime_2weeks": 2400,
           "playtime_forever": 173564
         },
         {
           "appid": 1133870,
-          "playtime_2weeks": 1960,
-          "playtime_forever": 2725
+          "playtime_2weeks": 2279,
+          "playtime_forever": 3155
         },
         {
           "appid": 2141910,
-          "playtime_2weeks": 573,
-          "playtime_forever": 37706
+          "playtime_2weeks": 600,
+          "playtime_forever": 37733
         },
         {
           "appid": 2868840,
-          "playtime_2weeks": 328,
-          "playtime_forever": 14036
+          "playtime_2weeks": 415,
+          "playtime_forever": 14159
         },
         {
           "appid": 1245620,

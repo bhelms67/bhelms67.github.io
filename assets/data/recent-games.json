@@ -8,6 +8,11 @@
       },
       "games": [
         {
+          "appid": 381210,
+          "playtime_2weeks": 124,
+          "playtime_forever": 124
+        },
+        {
           "appid": 730,
           "playtime_2weeks": 21,
           "playtime_forever": 13010
@@ -22,23 +27,23 @@
       },
       "games": [
         {
+          "appid": 2075800,
+          "playtime_2weeks": 3023,
+          "playtime_forever": 3023
+        },
+        {
           "appid": 2868840,
-          "playtime_2weeks": 2285,
+          "playtime_2weeks": 2172,
           "playtime_forever": 7521
         },
         {
-          "appid": 2075800,
-          "playtime_2weeks": 2267,
-          "playtime_forever": 2267
-        },
-        {
           "appid": 1366800,
-          "playtime_2weeks": 1295,
+          "playtime_2weeks": 974,
           "playtime_forever": 267767
         },
         {
           "appid": 3282300,
-          "playtime_2weeks": 1167,
+          "playtime_2weeks": 846,
           "playtime_forever": 7049
         },
         {
@@ -57,8 +62,8 @@
       "games": [
         {
           "appid": 3282300,
-          "playtime_2weeks": 1313,
-          "playtime_forever": 7151
+          "playtime_2weeks": 1145,
+          "playtime_forever": 7153
         },
         {
           "appid": 2075800,
@@ -77,8 +82,8 @@
         },
         {
           "appid": 381210,
-          "playtime_2weeks": 238,
-          "playtime_forever": 238
+          "playtime_2weeks": 467,
+          "playtime_forever": 467
         }
       ]
     },
@@ -91,12 +96,12 @@
       "games": [
         {
           "appid": 2868840,
-          "playtime_2weeks": 1176,
-          "playtime_forever": 6966
+          "playtime_2weeks": 1234,
+          "playtime_forever": 7024
         },
         {
           "appid": 3282300,
-          "playtime_2weeks": 755,
+          "playtime_2weeks": 560,
           "playtime_forever": 2656
         },
         {
@@ -115,12 +120,12 @@
       "games": [
         {
           "appid": 1133870,
-          "playtime_2weeks": 2239,
+          "playtime_2weeks": 1938,
           "playtime_forever": 3312
         },
         {
           "appid": 2141910,
-          "playtime_2weeks": 925,
+          "playtime_2weeks": 883,
           "playtime_forever": 38342
         },
         {

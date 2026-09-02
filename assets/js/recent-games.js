@@ -94,7 +94,7 @@ function addProfileOptions(profiles) {
   profiles.forEach((steamProfile, index) => {
     const option = document.createElement('option');
     option.value = String(index);
-    option.textContent = steamProfile.player?.name || steamProfile.steamId;
+    option.textContent = steamProfile.player?.name || 'Unknown Steam profile';
     profileSelect.appendChild(option);
   });
 

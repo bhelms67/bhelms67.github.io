@@ -75,7 +75,6 @@ jobs:
                   games = recent_games_data.get('response', {}).get('games', [])
                   profiles.append(
                       {
-                          'steamId': steam_id,
                           'player': {
                               'name': player['personaname'],
                               'avatar': player.get('avatarfull', ''),

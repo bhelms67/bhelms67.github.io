@@ -1,7 +1,6 @@
 {
   "profiles": [
     {
-      "steamId": "76561197962081680",
       "player": {
         "name": "Tacota",
         "avatar": "https://avatars.steamstatic.com/30ab01b8ed6b2d93588ce6eb78dd362c9cc277fb_full.jpg"
@@ -20,7 +19,6 @@
       ]
     },
     {
-      "steamId": "76561198001730987",
       "player": {
         "name": "Enemy West Close",
         "avatar": "https://avatars.steamstatic.com/c15e3cb5d56703de9ff7eaee79baa24aa4736cd6_full.jpg"
@@ -54,7 +52,6 @@
       ]
     },
     {
-      "steamId": "76561197992132085",
       "player": {
         "name": "RowdyFalcon",
         "avatar": "https://avatars.steamstatic.com/32f2d9c146418c4ace9fb8906845eea672330a3e_full.jpg"
@@ -88,7 +85,6 @@
       ]
     },
     {
-      "steamId": "76561197989866204",
       "player": {
         "name": "Fallen",
         "avatar": "https://avatars.steamstatic.com/049116dc3827584518d1124b90aa06b7fab8d023_full.jpg"
@@ -112,7 +108,6 @@
       ]
     },
     {
-      "steamId": "76561198025429116",
       "player": {
         "name": "viligante8",
         "avatar": "https://avatars.steamstatic.com/950f9f3147d4c8530a5072825d01c34ee3f1afa1_full.jpg"
@@ -146,7 +141,6 @@
       ]
     },
     {
-      "steamId": "76561197968541621",
       "player": {
         "name": "Ssizzle",
         "avatar": "https://avatars.steamstatic.com/ab373608d237e98824772d027dfa6eb8ccb895e0_full.jpg"

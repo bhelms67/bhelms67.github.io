@@ -1,4 +1,4 @@
-const recentGamesUrl = 'https://raw.githubusercontent.com/bhelms67/bhelms67.github.io/master/assets/data/recent-games.json';
+const recentGamesUrl = '/assets/data/recent-games.json';
 const embeds = document.getElementById('steamdb-embeds');
 const profile = document.getElementById('steam-profile');
 const profileSelect = document.getElementById('steam-profile-select');

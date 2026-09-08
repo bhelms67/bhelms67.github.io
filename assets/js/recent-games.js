@@ -81,8 +81,7 @@ function addGame(game) {
 
   const iframe = document.createElement('iframe');
   iframe.src = `https://steamdb.info/embed/?appid=${game.appid}`;
-  iframe.height = '389';
-  iframe.style.cssText = 'border:0;overflow:hidden;width:50%';
+  iframe.title = `SteamDB details for Steam app ${game.appid}`;
   iframe.loading = 'lazy';
   gameContainer.appendChild(iframe);
 

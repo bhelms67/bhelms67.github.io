@@ -1,28 +1,36 @@
-<html>
+<!doctype html>
+<html lang="en">
 <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Blake Helms</title>
-</head>
-<body>
   <style>
-    h1 { color: white; }
-    h2 { color: white; }
-    p { color: white; }
-    body { background-color: black; }
+    body { background-color: black; color: white; }
+    .intro-image { display: block; height: auto; max-width: 100%; }
     .games-section { margin-top: 3rem; }
     .steam-profile-picker { color: white; margin-bottom: 1rem; }
     .steam-profile-picker select { margin-left: 0.5rem; }
-    .steam-profile { align-items: center; color: white; display: flex; gap: 0.75rem; margin-bottom: 1rem; }
-    .steam-profile img { height: 48px; width: 48px; }
+    .steam-profile { align-items: center; display: flex; gap: 0.75rem; margin-bottom: 1rem; }
+    .steam-profile img { height: 48px; max-width: 100%; width: 48px; }
     .steam-data-freshness { color: #aaa; }
     #steamdb-embeds { display: grid; gap: 1rem; }
     .steam-game { display: grid; gap: 0.5rem; }
-    .steam-game-playtime { color: white; }
     .steam-game-playtime p { margin: 0; }
     .steam-game-playtime-details { margin-left: 1rem; }
+    .steam-game iframe { border: 0; display: block; height: 389px; width: 50%; }
+    @media (max-width: 48rem) {
+      .steam-game iframe { width: 100%; }
+    }
   </style>
+</head>
+<body>
 
   <h1>Hello, this is my site. </h1>
-  <img src="/assets/images/compliments_to_the_chef.jpg" />
+  <img
+    class="intro-image"
+    src="/assets/images/compliments_to_the_chef.jpg"
+    alt="Compliments to the chef comic"
+  >
 
   <section class="games-section">
     <h2>Top 5 Steam Games - Last 2 Weeks</h2>

@@ -1,5 +1,6 @@
 const recentGamesUrl = '/assets/data/recent-games.json';
 const embeds = document.getElementById('steamdb-embeds');
+const freshness = document.getElementById('steam-data-freshness');
 const profile = document.getElementById('steam-profile');
 const profileSelect = document.getElementById('steam-profile-select');
 
@@ -31,6 +32,20 @@ function formatPlaytime(minutes) {
   }
 
   return remainingMinutes === 0 ? `${hours}h` : `${hours}h ${remainingMinutes}m`;
+}
+
+function showFreshness(generatedAt) {
+  const generatedDate = new Date(generatedAt);
+  if (Number.isNaN(generatedDate.getTime())) {
+    return;
+  }
+
+  const formattedDate = new Intl.DateTimeFormat(undefined, {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  }).format(generatedDate);
+  freshness.textContent = `Steam data last refreshed ${formattedDate}.`;
+  freshness.hidden = false;
 }
 
 function addGame(game) {
@@ -108,6 +123,7 @@ async function loadRecentGames() {
   const response = await fetch(recentGamesUrl);
   const data = await response.json();
   const profiles = data.profiles || [];
+  showFreshness(data.generatedAt);
 
   if (profiles.length === 0) {
     profileSelect.replaceChildren(new Option('No profiles available'));

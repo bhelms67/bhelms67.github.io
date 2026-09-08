@@ -13,6 +13,7 @@
     .steam-profile-picker select { margin-left: 0.5rem; }
     .steam-profile { align-items: center; color: white; display: flex; gap: 0.75rem; margin-bottom: 1rem; }
     .steam-profile img { height: 48px; width: 48px; }
+    .steam-data-freshness { color: #aaa; }
     #steamdb-embeds { display: grid; gap: 1rem; }
     .steam-game { display: grid; gap: 0.5rem; }
     .steam-game-playtime { color: white; }
@@ -31,6 +32,7 @@
         <option>Loading profiles...</option>
       </select>
     </label>
+    <p id="steam-data-freshness" class="steam-data-freshness" hidden></p>
     <div id="steam-profile" class="steam-profile"></div>
     <div id="steamdb-embeds"></div>
   </section>

@@ -120,6 +120,10 @@ function addProfileOptions(profiles) {
 
 async function loadRecentGames() {
   const response = await fetch(recentGamesUrl);
+  if (!response.ok) {
+    throw new Error(`Unable to load recent Steam games (HTTP ${response.status}).`);
+  }
+
   const data = await response.json();
   const profiles = data.profiles || [];
   showFreshness(data.generatedAt);

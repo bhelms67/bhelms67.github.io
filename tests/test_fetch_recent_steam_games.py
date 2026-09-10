@@ -111,6 +111,45 @@ class FetchRecentSteamGamesTests(unittest.TestCase):
 
         self.assertEqual(profiles[0]["games"], [])
 
+    def test_recent_playtime_sorts_games_without_being_published(self) -> None:
+        responses = iter(
+            [
+                {
+                    "response": {
+                        "players": [
+                            {"personaname": "Example", "avatarfull": "avatar.jpg"}
+                        ]
+                    }
+                },
+                {
+                    "response": {
+                        "games": [
+                            {
+                                "appid": 1,
+                                "playtime_2weeks": 10,
+                                "playtime_forever": 100,
+                            },
+                            {
+                                "appid": 2,
+                                "playtime_2weeks": 20,
+                                "playtime_forever": 200,
+                            },
+                        ]
+                    }
+                },
+            ]
+        )
+
+        def fetcher(url: str, request_name: str) -> dict[str, object]:
+            return next(responses)
+
+        profiles = steam_games.build_profiles(["123"], "secret", fetcher)
+
+        self.assertEqual([game["appid"] for game in profiles[0]["games"]], [2, 1])
+        self.assertTrue(
+            all("playtime_2weeks" not in game for game in profiles[0]["games"])
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

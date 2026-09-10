@@ -168,7 +168,6 @@ def fetch_profile(profile_identifier: str, api_key: str, fetcher: FetchJson) -> 
         "games": [
             {
                 "appid": game["appid"],
-                "playtime_2weeks": game.get("playtime_2weeks", 0),
                 "playtime_forever": game.get("playtime_forever", 0),
             }
             for game in sorted(

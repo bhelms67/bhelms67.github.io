@@ -7,6 +7,7 @@ import tempfile
 import unittest
 from pathlib import Path
 from urllib.error import HTTPError
+from urllib.parse import parse_qs, urlparse
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 
@@ -70,6 +71,7 @@ class FetchRecentSteamGamesTests(unittest.TestCase):
             )
 
         self.assertEqual(attempts, 1)
+        self.assertEqual(context.exception.status_code, 403)
         self.assertNotIn("must-not-appear", str(context.exception))
 
     def test_profile_failure_does_not_overwrite_existing_payload(self) -> None:
@@ -137,6 +139,8 @@ class FetchRecentSteamGamesTests(unittest.TestCase):
                         ]
                     }
                 },
+                {"game": {}},
+                {"game": {}},
             ]
         )
 
@@ -148,6 +152,156 @@ class FetchRecentSteamGamesTests(unittest.TestCase):
         self.assertEqual([game["appid"] for game in profiles[0]["games"]], [2, 1])
         self.assertTrue(
             all("playtime_2weeks" not in game for game in profiles[0]["games"])
+        )
+
+    def test_achievement_snapshot_is_derived_and_shared_data_is_cached(self) -> None:
+        request_counts: dict[str, int] = {}
+
+        def fetcher(url: str, request_name: str) -> dict[str, object]:
+            path = urlparse(url).path
+            query = parse_qs(urlparse(url).query)
+            request_counts[path] = request_counts.get(path, 0) + 1
+
+            if "GetPlayerSummaries" in path:
+                steam_id = query["steamids"][0]
+                return {
+                    "response": {
+                        "players": [
+                            {
+                                "personaname": f"Player {steam_id}",
+                                "avatarfull": "avatar.jpg",
+                            }
+                        ]
+                    }
+                }
+            if "GetRecentlyPlayedGames" in path:
+                return {
+                    "response": {
+                        "games": [
+                            {
+                                "appid": 10,
+                                "playtime_2weeks": 30,
+                                "playtime_forever": 120,
+                            }
+                        ]
+                    }
+                }
+            if "GetSchemaForGame" in path:
+                return {
+                    "game": {
+                        "availableGameStats": {
+                            "achievements": [
+                                {"name": "FIRST", "displayName": "First Steps"},
+                                {"name": "RARE", "displayName": "Rare Find"},
+                                {"name": "LOCKED", "displayName": "Still Locked"},
+                            ]
+                        }
+                    }
+                }
+            if "GetPlayerAchievements" in path:
+                return {
+                    "playerstats": {
+                        "success": True,
+                        "achievements": [
+                            {
+                                "apiname": "FIRST",
+                                "achieved": 1,
+                                "unlocktime": 1_000,
+                            },
+                            {
+                                "apiname": "RARE",
+                                "achieved": 1,
+                                "unlocktime": 2_000,
+                            },
+                            {
+                                "apiname": "LOCKED",
+                                "achieved": 0,
+                                "unlocktime": 0,
+                            },
+                        ],
+                    }
+                }
+            if "GetGlobalAchievementPercentagesForApp" in path:
+                return {
+                    "achievementpercentages": {
+                        "achievements": [
+                            {"name": "FIRST", "percent": 75.5},
+                            {"name": "RARE", "percent": 4.25},
+                            {"name": "LOCKED", "percent": 1.0},
+                        ]
+                    }
+                }
+            self.fail(f"Unexpected request: {request_name}")
+
+        profiles = steam_games.build_profiles(["123", "456"], "secret", fetcher)
+
+        expected_snapshot = {
+            "unlocked": 2,
+            "total": 3,
+            "rarest_unlocked": {"name": "Rare Find", "percent": 4.25},
+            "latest_unlock": {
+                "name": "Rare Find",
+                "unlocked_at": "1970-01-01T00:33:20Z",
+            },
+        }
+        self.assertEqual(profiles[0]["games"][0]["achievements"], expected_snapshot)
+        self.assertEqual(profiles[1]["games"][0]["achievements"], expected_snapshot)
+
+        schema_path = "/ISteamUserStats/GetSchemaForGame/v2/"
+        percentages_path = (
+            "/ISteamUserStats/GetGlobalAchievementPercentagesForApp/v2/"
+        )
+        player_achievements_path = "/ISteamUserStats/GetPlayerAchievements/v1/"
+        self.assertEqual(request_counts[schema_path], 1)
+        self.assertEqual(request_counts[percentages_path], 1)
+        self.assertEqual(request_counts[player_achievements_path], 2)
+
+    def test_forbidden_player_achievements_omit_only_the_snapshot(self) -> None:
+        def fetcher(url: str, request_name: str) -> dict[str, object]:
+            path = urlparse(url).path
+
+            if "GetPlayerSummaries" in path:
+                return {
+                    "response": {
+                        "players": [
+                            {"personaname": "Example", "avatarfull": "avatar.jpg"}
+                        ]
+                    }
+                }
+            if "GetRecentlyPlayedGames" in path:
+                return {
+                    "response": {
+                        "games": [
+                            {
+                                "appid": 1_867_240,
+                                "playtime_2weeks": 30,
+                                "playtime_forever": 120,
+                            }
+                        ]
+                    }
+                }
+            if "GetSchemaForGame" in path:
+                return {
+                    "game": {
+                        "availableGameStats": {
+                            "achievements": [
+                                {"name": "ACHIEVEMENT", "displayName": "Achievement"}
+                            ]
+                        }
+                    }
+                }
+            if "GetPlayerAchievements" in path:
+                raise steam_games.SteamRequestError(
+                    "Steam player achievements failed with HTTP 403.",
+                    status_code=403,
+                )
+            self.fail(f"Unexpected request: {request_name}")
+
+        profiles = steam_games.build_profiles(["123"], "secret", fetcher)
+
+        self.assertEqual(
+            profiles[0]["games"],
+            [{"appid": 1_867_240, "playtime_forever": 120}],
         )
 
 

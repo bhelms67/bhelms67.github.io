@@ -23,10 +23,15 @@ JsonObject = dict[str, Any]
 OpenUrl = Callable[..., Any]
 Sleep = Callable[[float], None]
 FetchJson = Callable[[str, str], JsonObject]
+AchievementCatalog = dict[str, JsonObject]
 
 
 class SteamRequestError(RuntimeError):
     """Raised when Steam data cannot be fetched safely."""
+
+    def __init__(self, message: str, *, status_code: int | None = None) -> None:
+        super().__init__(message)
+        self.status_code = status_code
 
 
 def _retry_delay(
@@ -70,7 +75,8 @@ def fetch_json(
         except HTTPError as error:
             if error.code not in TRANSIENT_HTTP_STATUS_CODES:
                 raise SteamRequestError(
-                    f"{request_name} failed with HTTP {error.code}."
+                    f"{request_name} failed with HTTP {error.code}.",
+                    status_code=error.code,
                 ) from None
             transient_error: HTTPError | URLError | TimeoutError | json.JSONDecodeError = error
         except (URLError, TimeoutError, json.JSONDecodeError) as error:
@@ -136,7 +142,212 @@ def resolve_steam_id(profile_identifier: str, api_key: str, fetcher: FetchJson) 
     return steam_id
 
 
-def fetch_profile(profile_identifier: str, api_key: str, fetcher: FetchJson) -> JsonObject:
+def _achievement_name(achievement: JsonObject, catalog: AchievementCatalog) -> str:
+    api_name = achievement.get("apiname")
+    if not isinstance(api_name, str):
+        return "Unknown achievement"
+
+    schema_achievement = catalog.get(api_name, {})
+    display_name = schema_achievement.get("displayName")
+    if isinstance(display_name, str) and display_name:
+        return display_name
+
+    player_name = achievement.get("name")
+    return player_name if isinstance(player_name, str) and player_name else api_name
+
+
+def _unlock_timestamp(unlock_time: object) -> str | None:
+    if not isinstance(unlock_time, (int, float)) or isinstance(unlock_time, bool):
+        return None
+    if unlock_time <= 0:
+        return None
+
+    try:
+        unlocked_at = datetime.fromtimestamp(unlock_time, timezone.utc)
+    except (OverflowError, OSError, ValueError):
+        return None
+    return unlocked_at.isoformat().replace("+00:00", "Z")
+
+
+def fetch_achievement_catalog(
+    app_id: int,
+    api_key: str,
+    fetcher: FetchJson,
+    catalog_cache: dict[int, AchievementCatalog],
+) -> AchievementCatalog:
+    if app_id in catalog_cache:
+        return catalog_cache[app_id]
+
+    schema_query = urlencode(
+        {"key": api_key, "appid": app_id, "l": "english", "format": "json"}
+    )
+    schema_url = (
+        "https://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/"
+        f"?{schema_query}"
+    )
+    schema_data = fetcher(schema_url, f"Steam achievement schema for app {app_id}")
+    schema_achievements = (
+        schema_data.get("game", {})
+        .get("availableGameStats", {})
+        .get("achievements", [])
+    )
+    if not isinstance(schema_achievements, list):
+        raise SteamRequestError(
+            f"Steam returned an invalid achievement schema for app {app_id}."
+        )
+
+    catalog = {
+        achievement["name"]: achievement
+        for achievement in schema_achievements
+        if isinstance(achievement, dict)
+        and isinstance(achievement.get("name"), str)
+    }
+    catalog_cache[app_id] = catalog
+    return catalog
+
+
+def fetch_global_achievement_percentages(
+    app_id: int,
+    fetcher: FetchJson,
+    percentage_cache: dict[int, dict[str, float]],
+) -> dict[str, float]:
+    if app_id in percentage_cache:
+        return percentage_cache[app_id]
+
+    percentage_query = urlencode({"gameid": app_id, "format": "json"})
+    percentage_url = (
+        "https://api.steampowered.com/ISteamUserStats/"
+        "GetGlobalAchievementPercentagesForApp/v2/"
+        f"?{percentage_query}"
+    )
+    percentage_data = fetcher(
+        percentage_url,
+        f"Steam global achievement percentages for app {app_id}",
+    )
+    percentage_entries = percentage_data.get("achievementpercentages", {}).get(
+        "achievements", []
+    )
+    if not isinstance(percentage_entries, list):
+        raise SteamRequestError(
+            f"Steam returned invalid global achievement percentages for app {app_id}."
+        )
+
+    percentages = {
+        achievement["name"]: float(achievement["percent"])
+        for achievement in percentage_entries
+        if isinstance(achievement, dict)
+        and isinstance(achievement.get("name"), str)
+        and isinstance(achievement.get("percent"), (int, float))
+        and not isinstance(achievement.get("percent"), bool)
+    }
+    percentage_cache[app_id] = percentages
+    return percentages
+
+
+def fetch_achievement_snapshot(
+    steam_id: str,
+    app_id: int,
+    api_key: str,
+    fetcher: FetchJson,
+    catalog_cache: dict[int, AchievementCatalog],
+    percentage_cache: dict[int, dict[str, float]],
+) -> JsonObject | None:
+    catalog = fetch_achievement_catalog(app_id, api_key, fetcher, catalog_cache)
+    if not catalog:
+        return None
+
+    player_query = urlencode(
+        {
+            "key": api_key,
+            "steamid": steam_id,
+            "appid": app_id,
+            "l": "english",
+            "format": "json",
+        }
+    )
+    player_url = (
+        "https://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v1/"
+        f"?{player_query}"
+    )
+    try:
+        player_data = fetcher(
+            player_url,
+            f"Steam player achievements for app {app_id}",
+        )
+    except SteamRequestError as error:
+        if error.status_code != 403:
+            raise
+        print(
+            f"Warning: Steam player achievements are unavailable for app {app_id} "
+            "(HTTP 403); omitting its achievement snapshot.",
+            file=sys.stderr,
+        )
+        return None
+
+    player_stats = player_data.get("playerstats", {})
+    if player_stats.get("success") is not True:
+        return None
+
+    player_achievements = player_stats.get("achievements", [])
+    if not isinstance(player_achievements, list):
+        raise SteamRequestError(
+            f"Steam returned invalid player achievements for app {app_id}."
+        )
+
+    unlocked = [
+        achievement
+        for achievement in player_achievements
+        if isinstance(achievement, dict)
+        and achievement.get("achieved") == 1
+        and achievement.get("apiname") in catalog
+    ]
+    snapshot: JsonObject = {
+        "unlocked": len(unlocked),
+        "total": len(catalog),
+    }
+
+    if not unlocked:
+        return snapshot
+
+    percentages = fetch_global_achievement_percentages(
+        app_id,
+        fetcher,
+        percentage_cache,
+    )
+    unlocked_with_percentages = [
+        (achievement, percentages[achievement["apiname"]])
+        for achievement in unlocked
+        if achievement.get("apiname") in percentages
+    ]
+    if unlocked_with_percentages:
+        rarest, percent = min(unlocked_with_percentages, key=lambda item: item[1])
+        snapshot["rarest_unlocked"] = {
+            "name": _achievement_name(rarest, catalog),
+            "percent": percent,
+        }
+
+    unlocked_with_dates = [
+        (achievement, unlocked_at)
+        for achievement in unlocked
+        if (unlocked_at := _unlock_timestamp(achievement.get("unlocktime")))
+    ]
+    if unlocked_with_dates:
+        latest, unlocked_at = max(unlocked_with_dates, key=lambda item: item[1])
+        snapshot["latest_unlock"] = {
+            "name": _achievement_name(latest, catalog),
+            "unlocked_at": unlocked_at,
+        }
+
+    return snapshot
+
+
+def fetch_profile(
+    profile_identifier: str,
+    api_key: str,
+    fetcher: FetchJson,
+    catalog_cache: dict[int, AchievementCatalog],
+    percentage_cache: dict[int, dict[str, float]],
+) -> JsonObject:
     steam_id = resolve_steam_id(profile_identifier, api_key, fetcher)
 
     player_query = urlencode({"key": api_key, "steamids": steam_id, "format": "json"})
@@ -160,22 +371,36 @@ def fetch_profile(profile_identifier: str, api_key: str, fetcher: FetchJson) -> 
     if not isinstance(games, list):
         raise SteamRequestError("Steam returned an invalid recent-games list.")
 
+    selected_games = sorted(
+        games,
+        key=lambda game: game.get("playtime_2weeks", 0),
+        reverse=True,
+    )[:5]
+    public_games = []
+    for game in selected_games:
+        app_id = game["appid"]
+        public_game = {
+            "appid": app_id,
+            "playtime_forever": game.get("playtime_forever", 0),
+        }
+        achievement_snapshot = fetch_achievement_snapshot(
+            steam_id,
+            app_id,
+            api_key,
+            fetcher,
+            catalog_cache,
+            percentage_cache,
+        )
+        if achievement_snapshot is not None:
+            public_game["achievements"] = achievement_snapshot
+        public_games.append(public_game)
+
     return {
         "player": {
             "name": player["personaname"],
             "avatar": player.get("avatarfull", ""),
         },
-        "games": [
-            {
-                "appid": game["appid"],
-                "playtime_forever": game.get("playtime_forever", 0),
-            }
-            for game in sorted(
-                games,
-                key=lambda game: game.get("playtime_2weeks", 0),
-                reverse=True,
-            )[:5]
-        ],
+        "games": public_games,
     }
 
 
@@ -185,9 +410,19 @@ def build_profiles(
     fetcher: FetchJson = fetch_json,
 ) -> list[JsonObject]:
     profiles = []
+    catalog_cache: dict[int, AchievementCatalog] = {}
+    percentage_cache: dict[int, dict[str, float]] = {}
     for index, profile_identifier in enumerate(profile_identifiers, start=1):
         try:
-            profiles.append(fetch_profile(profile_identifier, api_key, fetcher))
+            profiles.append(
+                fetch_profile(
+                    profile_identifier,
+                    api_key,
+                    fetcher,
+                    catalog_cache,
+                    percentage_cache,
+                )
+            )
         except (KeyError, TypeError, AttributeError, SteamRequestError) as error:
             raise SteamRequestError(
                 f"Configured Steam profile #{index} could not be refreshed: {error}"

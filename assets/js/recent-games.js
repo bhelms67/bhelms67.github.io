@@ -48,6 +48,45 @@ function showFreshness(generatedAt) {
   freshness.hidden = false;
 }
 
+function addAchievementSnapshot(game, gameContainer) {
+  const achievements = game.achievements;
+  if (!achievements
+      || !Number.isInteger(achievements.unlocked)
+      || !Number.isInteger(achievements.total)) {
+    return;
+  }
+
+  const snapshot = document.createElement('div');
+  snapshot.className = 'steam-achievements';
+
+  const completion = document.createElement('div');
+  completion.textContent = `Achievements: ${achievements.unlocked} / ${achievements.total} unlocked`;
+  snapshot.appendChild(completion);
+
+  const rarest = achievements.rarest_unlocked;
+  if (rarest?.name && Number.isFinite(rarest.percent)) {
+    const percentage = new Intl.NumberFormat(undefined, {
+      maximumFractionDigits: 2,
+    }).format(rarest.percent);
+    const rarestAchievement = document.createElement('div');
+    rarestAchievement.textContent = `Rarest earned: ${rarest.name} (${percentage}% of players)`;
+    snapshot.appendChild(rarestAchievement);
+  }
+
+  const latest = achievements.latest_unlock;
+  const unlockedAt = new Date(latest?.unlocked_at);
+  if (latest?.name && !Number.isNaN(unlockedAt.getTime())) {
+    const formattedDate = new Intl.DateTimeFormat(undefined, {
+      dateStyle: 'medium',
+    }).format(unlockedAt);
+    const latestAchievement = document.createElement('div');
+    latestAchievement.textContent = `Latest unlock: ${latest.name} (${formattedDate})`;
+    snapshot.appendChild(latestAchievement);
+  }
+
+  gameContainer.appendChild(snapshot);
+}
+
 function addGame(game) {
   const gameContainer = document.createElement('div');
   gameContainer.className = 'steam-game';
@@ -57,6 +96,8 @@ function addGame(game) {
     playtime.textContent = `All Time Played: ${formatPlaytime(game.playtime_forever)}`;
     gameContainer.appendChild(playtime);
   }
+
+  addAchievementSnapshot(game, gameContainer);
 
   const iframe = document.createElement('iframe');
   iframe.src = `https://steamdb.info/embed/?appid=${game.appid}`;
